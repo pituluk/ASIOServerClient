@@ -1,8 +1,11 @@
-#pragma once
+#ifndef ASIOSERVERCLIENT_SERVER_HPP
+#define ASIOSERVERCLIENT_SERVER_HPP
 #include <algorithm>
 #include <array>
 #include <asio.hpp>
+#ifdef ASIOSERVERCLIENT_HAVE_OPENSSL
 #include <asio/ssl.hpp>
+#endif
 #include <atomic>
 #include <concepts>
 #include <cstdint>
@@ -96,7 +99,7 @@ public:
 			if (!write_in_progress) {
 				this->do_write();
 			}
-			});
+					});
 	}
 
 	void disconnect() override {
@@ -211,6 +214,7 @@ public:
 	}
 };
 
+#ifdef ASIOSERVERCLIENT_HAVE_OPENSSL
 class SSLConnection : public BaseConnection<asio::ssl::stream<asio::ip::tcp::socket>> {
 public:
 	SSLConnection(asio::ip::tcp::socket socket_, asio::io_context& io_context,
@@ -235,6 +239,8 @@ public:
 
 };
 
+#endif
+
 class ConnectionFactory {
 public:
 	virtual ~ConnectionFactory() = default;
@@ -243,7 +249,7 @@ public:
 		return std::make_shared<TCPConnection>(std::move(socket), io_context, ip, realIP);
 	};
 };
-
+#ifdef ASIOSERVERCLIENT_HAVE_OPENSSL
 struct SSLInitContext
 {
 	SSLInitContext(const std::vector<std::uint8_t>& chain_file, const std::vector<std::uint8_t>& private_key_file, const std::vector<std::vector<std::uint8_t>>& ca_file, asio::ssl::context::file_format file_format = asio::ssl::context::pem, asio::ssl::context::method ssl_method = asio::ssl::context::tlsv12_server)
@@ -282,6 +288,7 @@ public:
 protected:
 	asio::ssl::context ssl_ctx;
 };
+#endif
 
 
 class TCPServer {
@@ -355,4 +362,7 @@ private:
 	asio::ip::udp::socket socket;
 	asio::ip::udp::endpoint remoteEndpoint;
 	std::size_t threads = 1;
+
 };
+
+#endif // ASIOSERVERCLIENT_SERVER_HPP

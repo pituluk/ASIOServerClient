@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include <ASIOServerClient/Server.hpp>
 #include <algorithm>
 #include <iostream>
 #include <ranges>
@@ -100,7 +100,7 @@ void TCPServer::stop() {
 		}
 	}
 	std::promise<void> shutdownDone;
-	serverStrand.dispatch([this, &shutdownDone] {
+	asio::dispatch(serverStrand, [this, &shutdownDone] {
 		acceptor.close();
 		workGuard.reset();
 		context.stop();
@@ -173,7 +173,7 @@ void TCPServer::onDisconnect(ConnectionPtr connection) {
 }
 
 void TCPServer::do_accept() {
-	serverStrand.post([this] {
+	asio::post(serverStrand, [this] {
 		acceptor.async_accept(
 			[this](std::error_code ec, asio::ip::tcp::socket socket) {
 				if (!ec) {
@@ -181,36 +181,36 @@ void TCPServer::do_accept() {
 					asio::ip::address ip = socket.remote_endpoint().address();
 					asio::ip::address realIP;
 					if (!proxied) {
-						realIP = ip;
-					}
-					else {
-						proxyHeader proxyheader;
-						proxyHeader::read_proxy_header(&socket, proxyheader);
-						auto status = proxyheader.decode_header();
-						if (status == proxyHeaderParseStatus::SuccessProxy) {
-							realIP = asio::ip::make_address_v4(proxyheader.src_addr);
-						}
-						else {
-							onError(std::make_error_code(std::errc::invalid_argument), "Proxy header failed " + std::to_string(static_cast<int>(status)), nullptr, &socket);
-							return;
-						}
-					}
-					ConnectionPtr conn = connectionFactory->create(std::move(socket), context, ip, realIP);
-					conn->onErrorCb = [this, conn](std::error_code ec, std::string_view message) {this->onError(ec, message, conn); };
-					conn->onDisconnectCb = [this, conn]() {this->onDisconnect(conn); };
-					bool allowed = join(conn);
-					if (allowed) {
-						conn->start();
-					}
-					else {
-						onError(std::make_error_code(std::errc::permission_denied), "Connection not allowed", conn, nullptr);
-						conn->shutdown();
-					}
+					realIP = ip;
 				}
 				else {
-					onError(ec, "Accept failed", nullptr, &socket);
+					proxyHeader proxyheader;
+					proxyHeader::read_proxy_header(&socket, proxyheader);
+					auto status = proxyheader.decode_header();
+					if (status == proxyHeaderParseStatus::SuccessProxy) {
+						realIP = asio::ip::make_address_v4(proxyheader.src_addr);
+					}
+					else {
+						onError(std::make_error_code(std::errc::invalid_argument), "Proxy header failed " + std::to_string(static_cast<int>(status)), nullptr, &socket);
+						return;
+					}
 				}
-				do_accept();
+				ConnectionPtr conn = connectionFactory->create(std::move(socket), context, ip, realIP);
+				conn->onErrorCb = [this, conn](std::error_code ec, std::string_view message) {this->onError(ec, message, conn); };
+				conn->onDisconnectCb = [this, conn]() {this->onDisconnect(conn); };
+				bool allowed = join(conn);
+				if (allowed) {
+					conn->start();
+				}
+				else {
+					onError(std::make_error_code(std::errc::permission_denied), "Connection not allowed", conn, nullptr);
+					conn->shutdown();
+				}
+			}
+			else {
+				onError(ec, "Accept failed", nullptr, &socket);
+			}
+			do_accept();
 			});
 		});
 }
@@ -261,7 +261,7 @@ void UDPServer::start_receive() {
 				std::shared_lock lock(handlerGuard);
 				for (auto& handler : dataHandlers)
 				{
-					context.post([this, handler, endpoint, data] {
+					asio::post(context,[this, handler, endpoint, data] {
 						handler(*this, endpoint, data);
 						});
 

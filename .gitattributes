@@ -1,4 +1,10 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-/TestClient export-ignore
-/Shared/packets export-ignore
+# Exclude examples, test apps and build artifacts from `git archive` and GitHub release zips
+Example/ export-ignore
+build/ export-ignore
+x64/ export-ignore
+*.sln export-ignore
+*.vcxproj* export-ignore
+*.user export-ignore
+.vs/ export-ignore
+
+# Keep README and license (do not export-ignore)

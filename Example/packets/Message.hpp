@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EXAMPLE_PACKETS_MESSAGE_HPP
+#define EXAMPLE_PACKETS_MESSAGE_HPP
 #include "PacketBase.hpp"
 class SMessage : public PacketBase<SMessage> //for server use
 {
@@ -44,3 +45,5 @@ public:
     std::string name;
     std::string message;
 };
+
+#endif // EXAMPLE_PACKETS_MESSAGE_HPP
