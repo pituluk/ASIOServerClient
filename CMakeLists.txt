@@ -16,7 +16,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(asio)
 
-file(GLOB ASIOSERVER_SOURCES "${CMAKE_SOURCE_DIR}/src/ASIOServerClient/*.cpp")
+file(GLOB ASIOSERVER_SOURCES CONFIGURE_DEPENDS
+  "${CMAKE_CURRENT_LIST_DIR}/src/ASIOServerClient/*.cpp"
+)
 
 add_library(ASIOServerClient ${ASIOSERVER_SOURCES})
 
@@ -27,7 +29,7 @@ add_library(ASIOServerClient::ASIOServerClient ALIAS ASIOServerClient)
 target_compile_features(ASIOServerClient PUBLIC cxx_std_20)
 
 target_include_directories(ASIOServerClient PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
@@ -57,8 +59,8 @@ install(TARGETS ASIOServerClient EXPORT ASIOServerClientTargets
 install(EXPORT ASIOServerClientTargets FILE ASIOServerClientTargets.cmake NAMESPACE ASIOServerClient:: DESTINATION lib/cmake/ASIOServerClient)
 
 # Install public headers
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION include)
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/ DESTINATION include)
 
-if(BUILD_EXAMPLE AND EXISTS "${CMAKE_SOURCE_DIR}/Example/CMakeLists.txt")
+if(BUILD_EXAMPLE AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/Example/CMakeLists.txt")
   add_subdirectory(Example)
 endif()
