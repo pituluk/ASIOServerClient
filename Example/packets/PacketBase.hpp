@@ -1,6 +1,6 @@
 #ifndef EXAMPLE_PACKETS_PACKETBASE_HPP
 #define EXAMPLE_PACKETS_PACKETBASE_HPP
-#include "Buffer.hpp"
+#include <ASIOServerClient/Buffer.hpp>
 #include <iostream>
 template <typename Derived>
 class PacketBase
