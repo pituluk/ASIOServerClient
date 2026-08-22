@@ -4,6 +4,7 @@
 //edited by pituluk https://github.com/pituluk
 #include <vector>  // buffers
 #include <sstream> // strings, byteStr()
+#include <cstdint>
 #include <span>
 #include <bit>
 #include <array>
@@ -93,37 +94,38 @@ public:
 
     /************************** Reading ***************************/
 
-    void setReadOffset(size_t);
-    size_t getReadOffset() const noexcept;
+    void setReadOffset(std::size_t);
+    std::size_t getReadOffset() const noexcept;
+    std::size_t remainingBytes() const noexcept;
     template <class T> inline T readBytes(bool LE = true);
 
     bool readBool();
-    std::vector<uint8_t> readVec(size_t len);
-    std::string readStr(size_t len);
+    std::vector<std::uint8_t> readVec(std::size_t len);
+    std::string readStr(std::size_t len);
     std::string readStrU16LE();
     std::string readStrU16BE();
     std::string readStrU32LE();
     std::string readStrU32BE();
-    std::string readStrU16LE(size_t minlen);
-    std::string readStrU16BE(size_t minlen);
-    std::string readStrU16LE(size_t minlen, size_t maxlen);
-    std::string readStrU16BE(size_t minlen, size_t maxlen);
-    std::string readStrU32LE(size_t minlen);
-    std::string readStrU32BE(size_t minlen);
-    std::string readStrU32LE(size_t minlen, size_t maxlen);
-    std::string readStrU32BE(size_t minlen, size_t maxlen);
-    std::wstring readWStr(size_t len);
+    std::string readStrU16LE(std::size_t minlen);
+    std::string readStrU16BE(std::size_t minlen);
+    std::string readStrU16LE(std::size_t minlen, std::size_t maxlen);
+    std::string readStrU16BE(std::size_t minlen, std::size_t maxlen);
+    std::string readStrU32LE(std::size_t minlen);
+    std::string readStrU32BE(std::size_t minlen);
+    std::string readStrU32LE(std::size_t minlen, std::size_t maxlen);
+    std::string readStrU32BE(std::size_t minlen, std::size_t maxlen);
+    std::wstring readWStr(std::size_t len);
     std::wstring readWStrU16LE();
     std::wstring readWStrU16BE();
     std::wstring readWStrU32LE();
     std::wstring readWStrU32BE();
-    std::wstring readWStrU16LE(size_t minlen);
-    std::wstring readWStrU16BE(size_t minlen);
-    std::wstring readWStrU16LE(size_t minlen, size_t maxlen);
-    std::wstring readWStrU16BE(size_t minlen, size_t maxlen);
-    std::wstring readWStrU32LE(size_t minlen, size_t maxlen);
-    std::wstring readWStrU32BE(size_t minlen, size_t maxlen);
-    std::u16string readU16Str(size_t len);
+    std::wstring readWStrU16LE(std::size_t minlen);
+    std::wstring readWStrU16BE(std::size_t minlen);
+    std::wstring readWStrU16LE(std::size_t minlen, std::size_t maxlen);
+    std::wstring readWStrU16BE(std::size_t minlen, std::size_t maxlen);
+    std::wstring readWStrU32LE(std::size_t minlen, std::size_t maxlen);
+    std::wstring readWStrU32BE(std::size_t minlen, std::size_t maxlen);
+    std::u16string readU16Str(std::size_t len);
     std::int8_t readInt8();
     std::uint8_t readUInt8();
 
@@ -150,7 +152,7 @@ public:
     ~Buffer();
 private:
     std::vector<std::uint8_t> buffer;
-    size_t readOffset = 0;
+    std::size_t readOffset = 0;
     static constexpr bool isLE = getEndiannes();
 };
 

@@ -198,6 +198,9 @@ void Buffer::setReadOffset(std::size_t newOffset) {
 std::size_t Buffer::getReadOffset() const noexcept {
     return readOffset;
 }
+std::size_t Buffer::remainingBytes() const noexcept {
+    return buffer.size() - readOffset;
+}
 template <class T> inline T Buffer::readBytes(bool LE) {
     T result = 0;
     std::size_t size = sizeof(T);
