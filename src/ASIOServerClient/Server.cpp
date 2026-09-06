@@ -228,7 +228,7 @@ UDPServer::UDPServer(const asio::ip::address& ip_, unsigned short port_, std::si
 			}
 			catch (const std::exception& ec)
 			{
-				std::cout << ec.what(); //TBD
+				std::cerr << ec.what(); //TBD
 			}
 			});
 	}
